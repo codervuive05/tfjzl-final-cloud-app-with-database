@@ -9,9 +9,9 @@ class AssessmentFlowTests(TestCase):
         self.user = User.objects.create_user(username='learner', password='test-only')
         self.course = Course.objects.create(name='Python', description='Practice')
         Enrollment.objects.create(user=self.user, course=self.course)
-        self.question = Question.objects.create(course=self.course, content='Select correct choices', grade=10)
-        self.good = Choice.objects.create(question=self.question, content='Correct', is_correct=True)
-        self.bad = Choice.objects.create(question=self.question, content='Incorrect')
+        self.question = Question.objects.create(course=self.course, question_text='Select correct choices', grade=10)
+        self.good = Choice.objects.create(question=self.question, choice_text='Correct', is_correct=True)
+        self.bad = Choice.objects.create(question=self.question, choice_text='Incorrect')
         self.client.force_login(self.user)
 
     def test_extra_wrong_choice_prevents_credit(self):
@@ -31,5 +31,5 @@ class AssessmentFlowTests(TestCase):
         self.assertContains(response, 'Congratulations')
         self.client.force_login(User.objects.create_user(username='other', password='test-only'))
         submission = Submission.objects.get()
-        denied = self.client.get(reverse('onlinecourse:exam_result', args=[self.course.id, submission.id]))
+        denied = self.client.get(reverse('onlinecourse:show_exam_result', args=[self.course.id, submission.id]))
         self.assertEqual(denied.status_code, 404)
